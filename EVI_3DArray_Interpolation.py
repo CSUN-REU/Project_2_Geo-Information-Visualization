@@ -13,7 +13,7 @@ totalFile = len(os.listdir(directory))
 print("Intepelating Imiges...")
 
 #This is a 3D array with this order: [ROWS][COLS][DEPTH]
-InterpelatedArray = [][][]
+InterpelatedArray = numpy.zeros((m,n,p))
 depth = 0   #Starting depth
 
 
@@ -43,8 +43,8 @@ for filename in os.listdir(directory):
             
 
 #Iterate by each pixel and inteperating the DEPTH array
-for row in range(ROWS)
-    for cols in range(COLS)
+for row in range(ROWS):
+    for cols in range(COLS):
         InterpelatedArray[row][cols].interpolate(method ='linear', limit_direction ='both')
 
 print("Image Interpelation Compleate... Generating Imiges... ")
@@ -54,7 +54,7 @@ totalFile = len(totalFile = len(os.listdir(directory))) * 16
 
 
 #Create an image one depth at a time
-for depth in range(InterpelatedArray)
+for depth in range(InterpelatedArray):
 
     print("File: " + str(currFile) + "/" + str(totalFile))
 
