@@ -1,25 +1,24 @@
 import numpy as np
-from PIL import Image
 import os
 import imageio
 
+from PIL import Image
+from tifffile import imsave, imread
 ROWS = 2272
 COLS = 2485
 TotalFilesTemp = 320
 
 
 directory = 'Datasets/EVI' #source directory
-
+itteration = 1
 currFile = 0
 totalFile = len(os.listdir(directory))*16
+depth = 0   #Starting depth
+FileArray = np.zeros(len(os.listdir(directory)))  #Array that stores all of the exsisting EVI Files
+
 
 print("Generating the Array...")
 
-#This is a 3D array with this order: [ROWS][COLS][DEPTH]
-InterpelatedArray = np.empty((ROWS, COLS,TotalFilesTemp))
-depth = 0   #Starting depth
-
-FileArray = np.zeros(len(os.listdir(directory)))    
 
 #iterate over files and copy them into the 3D array
 for filename in os.listdir(directory):
@@ -29,22 +28,49 @@ for filename in os.listdir(directory):
         #open EVI tif file
         EVI = Image.open(f)
         FileArray[filename] = EVI
+        currFile += 1
+
+currFile = 0
 
 #Looping though each of the EVI 
-for EVI_File in range len(FileArray):
+for EVI_File in range (len(FileArray)):
+
+    #This is an empty 3D array with this order: [ROWS][COLS][DEPTH]
+    InterpelatedArray = np.empty((ROWS, COLS, 14))
+
     #loop through pixels of the image
     for row in range(ROWS):
-
         #Making sure that I don't go outside the bounds of the index
         if row+1 < len(FileArray)-1:
             EVI1 = FileArray[row]
-            EVI2 = FileArray[row+1] 
+            EVI2 = FileArray[row+1]
+        else:
+            break   #If this condition is true it means I have interpelated the last EVI file in the array
+        
 
         for cols in range(COLS):
 
-            #traverse the rows and colloms and copy them into the new array
-            InterpelatedArray[row][cols][depth] = EVIarray[row][cols]
+            #Labeling the elements needed for the interpelation
+            y1 = EVI1[row][cols]
+            y2 = EVI2[row][cols]
             
+            #filling in the interpelation data for one pixel for the 14 days in the 3D array
+            for x in range(14):
+                InterpelatedArray[row][cols][x]= y1+((x+2)-1)*((y2-y1)/(16-1))
+    
+    print("Image Interpelation Compleate:" + itteration + " / 231 ...Generating Imiges... ")
+
+    #Generating Tiff Files
+    for y in range(14):
+        level = InterpelatedArray[y]
+        saveLocation = "C:\Users\denys\Documents\GitHub\Project_2\Datasets\EVI_Interpelated"
+        imageio.imwrite(saveLocation, level)
+        im = imread(saveLocation)
+        imsave(saveLocation, im, compress=6)
+
+            
+
+
 
 
 #this is used to append 15 empty arrays between the avalible EVI imiges
@@ -63,7 +89,7 @@ for row in range(ROWS):
     for cols in range(COLS):
         InterpelatedArray[row][cols].interpolate(method ='linear', limit_direction ='both')
 
-print("Image Interpelation Compleate... Generating Imiges... ")
+
 
 currFile = 0
 totalFile = len(totalFile = len(os.listdir(directory))) * 16
