@@ -3,6 +3,8 @@ from PIL import Image
 import os
 import imageio
 
+from tifffile import imsave, imread, imwrite
+
 ROWS = 2277
 COLS = 2614
 
@@ -26,15 +28,17 @@ for filename in os.listdir(directory):
 
         #open EVI tif file
         EVI = Image.open(f)
-        EVIarray = np.array(EVI)
+        EVIFilearray = np.array(EVI)
+        print(len(EVIFilearray))
+        print(len(EVIFilearray[0]))
 
         #loop through pixels
         for r in range(ROWS):
             for c in range(COLS):
-
+                #print(str(c))
                 #if EVI is valid, fill value of blank array
-                if(EVIarray[r][c] > 0):
-                    value = int(((EVIarray[r][c]+2000)/12000)*255)
+                if(EVIFilearray[r][c] > 0):
+                    value = int(((EVIFilearray[r][c]+2000)/12000)*255)
                     pixels[r,c] = (value,value,value)
                 #if invalid, set to white
                 else:
@@ -46,7 +50,7 @@ for filename in os.listdir(directory):
         im = im.transpose(Image.FLIP_LEFT_RIGHT)
 
         #write file
-        imageio.imwrite("C:/Users/denys/Documents/GitHub/Project_2/Datasets/EVI_Visulized" + f[4:] + ".png", im) 
+        imageio.imwrite("Datasets/EVI_Visulized/" + str(currFile) + ".png", im) 
 
         currFile += 1
 
