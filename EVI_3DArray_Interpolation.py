@@ -1,9 +1,11 @@
 import numpy as np
 import os
 import imageio
+import PIL 
 
-from PIL import Image
+from PIL import Image 
 from tifffile import imsave, imread
+
 ROWS = 2277
 COLS = 2614
 TotalFilesTemp = 320
@@ -62,19 +64,17 @@ for EVI_File in range (len(FileArray)):
             
             #filling in the interpelation data for one pixel for the 14 days in the 3D array
             for x in range(14):
-                InterpelatedArray[row][cols][x]= y1+((x+2)-1)*((y2-y1)/(16-1))
+                InterpelatedArray[row][cols][x]= int((y1+((x+2)-1)*((y2-y1)/(16-1))) *1000)      #I am multipling the data by 1000 to scale it and not loose the data
     
     print("Image Interpelation Compleate: " + str(itteration) + " / " + str(dirFile) + " ...Generating Imiges... ")
     itteration += 1
 
-    #Generating Tiff Files  
+    #Generating Tiff Files Using NpArray 
     for y in range(14):
-        level = InterpelatedArray[y]
+        saveData = Image.open(Image.fromarray(InterpelatedArray[y]))
         saveName = "EVI_Interpelated" + str(day)
         saveLocation = "C:/Users/denys/Documents/GitHub/Project_2/Datasets/EVI_Interpelated/" + str(saveName) + ".tif"
-        imageio.imwrite(saveLocation, level)
-        im = imread(saveLocation)
-        imsave(saveLocation, im)
+        saveData.save(str(saveLocation), 'TIFF')
         day +=1
     day +=1
 
