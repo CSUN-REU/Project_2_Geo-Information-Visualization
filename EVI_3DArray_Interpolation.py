@@ -4,40 +4,46 @@ import imageio
 
 from PIL import Image
 from tifffile import imsave, imread
-ROWS = 2272
-COLS = 2485
+ROWS = 2277
+COLS = 2614
 TotalFilesTemp = 320
 
 
 directory = 'Datasets/EVI' #source directory
 itteration = 1
-currFile = 0
+currFile = 1
+dirFile = len(os.listdir(directory))
 totalFile = len(os.listdir(directory))*16
 depth = 0   #Starting depth
-FileArray = np.zeros(len(os.listdir(directory)))  #Array that stores all of the exsisting EVI Files
+day = 1     #The starting day used for naming the files
+FileArray = np.zeros((dirFile, ROWS, COLS), int) #Array that stores all of the exsisting EVI Files
 
 
 print("Generating the Array...")
 
-
+count = 0
 #iterate over files and copy them into the 3D array
 for filename in os.listdir(directory):
     f = os.path.join(directory, filename)
     if os.path.isfile(f):
-        print("TIIF Stored: " + str(currFile) + "/" + '231')
-        #open EVI tif file
+        #open EVI tif file & store it in array
         EVI = Image.open(f)
-        FileArray[filename] = EVI
+        EVIarray = np.array(EVI)
+        FileArray[count] = EVIarray
+        print("TIIF Stored: " + str(currFile) + "/" + str(dirFile))
         currFile += 1
+    count += 1
 
 currFile = 0
+
+#This is an empty 3D array with this order: [ROWS][COLS][DEPTH]
+InterpelatedArray = np.empty((ROWS, COLS, 14))
+
 
 #Looping though each of the EVI 
 for EVI_File in range (len(FileArray)):
 
-    #This is an empty 3D array with this order: [ROWS][COLS][DEPTH]
-    InterpelatedArray = np.empty((ROWS, COLS, 14))
-
+    
     #loop through pixels of the image
     for row in range(ROWS):
         #Making sure that I don't go outside the bounds of the index
@@ -58,71 +64,19 @@ for EVI_File in range (len(FileArray)):
             for x in range(14):
                 InterpelatedArray[row][cols][x]= y1+((x+2)-1)*((y2-y1)/(16-1))
     
-    print("Image Interpelation Compleate:" + itteration + " / 231 ...Generating Imiges... ")
+    print("Image Interpelation Compleate: " + str(itteration) + " / " + str(dirFile) + " ...Generating Imiges... ")
+    itteration += 1
 
-    #Generating Tiff Files
+    #Generating Tiff Files  
     for y in range(14):
         level = InterpelatedArray[y]
-        saveLocation = "C:\Users\denys\Documents\GitHub\Project_2\Datasets\EVI_Interpelated"
+        saveName = "EVI_Interpelated" + str(day)
+        saveLocation = "C:/Users/denys/Documents/GitHub/Project_2/Datasets/EVI_Interpelated/" + str(saveName) + ".tif"
         imageio.imwrite(saveLocation, level)
         im = imread(saveLocation)
-        imsave(saveLocation, im, compress=6)
+        imsave(saveLocation, im)
+        day +=1
+    day +=1
 
             
 
-
-
-
-#this is used to append 15 empty arrays between the avalible EVI imiges
-for tempDepth in range(15):
-    #used to traverse the 3D array's depth
-    if(depth < TotalFilesTemp-1):
-        tempEmptyArray = np.empty((ROWS, COLS, 1, like=InterpelatedArray)
-        np.append(InterpelatedArray, tempEmptyArray, axis=2)
-        depth += 1
-
-            
-print("Interpelating Iniges...")
-
-#Iterpelate by each pixel and by the DEPTH array
-for row in range(ROWS):
-    for cols in range(COLS):
-        InterpelatedArray[row][cols].interpolate(method ='linear', limit_direction ='both')
-
-
-
-currFile = 0
-totalFile = len(totalFile = len(os.listdir(directory))) * 16
-
-
-#Create an image one depth at a time
-for depth in range(InterpelatedArray):
-    
-    print(currFile)
-    print("File: " + str(currFile) + "/" + str(totalFile))
-
-    #create blank image
-    im = Image.new(mode="RGB", size=(ROWS, COLS))
-    pixels = im.load()
-
-    #open EVI tif file
-    EVI = Image.open(f)
-    EVIarray = np.array(EVI)
-
-
-    #loop through pixels
-    for row in range(ROWS):
-        for col in range(COLS):
-            #if EVI is valid, fill value of blank array
-            if(InterpelatedArray[row][col][depth] > 0):
-                value = int(((EVIarray[row][col][depth]+2000)/12000)*255)
-                pixels[row,col] = (value,value,value)
-            #if invalid, set to white
-            else:
-                pixels[row,col] = (255,255,255)
-    print(f)
-    #transpose image
-    im = im.transpose(Image.ROTATE_270)
-    im = im.transpose(Image.FLIP_LEFT_RIGHT)
-    #write file
-    imageio.imwrite(r"C:\Users\denys\Documents\GitHub\Project_2\Datasets\EVI_Interpelated.png") #removed + f[:4]
