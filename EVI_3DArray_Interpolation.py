@@ -3,6 +3,9 @@ import os
 import imageio
 import PIL 
 import pandas as pd
+
+
+from multiprocessing import Pool
 from PIL import Image 
 from tifffile import imsave, imread
 
@@ -38,8 +41,7 @@ for filename in os.listdir(directory):
 currFile = 0
 
 #This is an empty 3D array with this order: [File][ROWS][COLS]
-InterpelatedArray = np.empty((14, ROWS, COLS))
-
+InterpelatedArray = np.empty((15, ROWS, COLS))
 
 
 #Looping though each of the EVI 
@@ -63,7 +65,7 @@ for EVI_File in range (len(FileArray)):
             y2 = EVI2[row][cols]
             
             #filling in the interpelation data for one pixel for the 14 days in the 3D array
-            for x in range(14): 
+            for x in range(15): 
                 #I am multipling the data by 1000 to scale it and not loose the data
                 InterpelatedArray[x][row][cols]= int((y1+((x+2)-1)*((y2-y1)/(16-1))) *1000)  
             
@@ -73,7 +75,7 @@ for EVI_File in range (len(FileArray)):
     itteration += 1
 
     #Generating Tiff Files Using NpArray 
-    for y in range(14):
+    for y in range(15):
         #InterpelatedArray = InterpelatedArray.astype(np.uint16)
         Data = Image.fromarray(InterpelatedArray)
         saveName = "EVI_Interpelated" + str(day)
@@ -84,3 +86,7 @@ for EVI_File in range (len(FileArray)):
 
             
 
+#Meathod for interpelating 15 imiges between the two file arrays
+
+
+def interpalateImiges()
