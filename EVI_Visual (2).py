@@ -5,8 +5,11 @@ import imageio
 
 from tifffile import imsave, imread, imwrite
 
-ROWS = 2277
-COLS = 2614
+ROWS = 2272
+COLS = 2485
+
+
+
 
 directory = 'Datasets\EVI_Interpelated' #source directory
 
@@ -29,8 +32,8 @@ for filename in os.listdir(directory):
         #open EVI tif file
         EVI = Image.open(f)
         EVIFilearray = np.array(EVI)
-        print(len(EVIFilearray))
-        print(len(EVIFilearray[0]))
+        #print(len(EVIFilearray))
+        #print(len(EVIFilearray[0]))
 
         #loop through pixels
         for r in range(ROWS):
@@ -38,7 +41,7 @@ for filename in os.listdir(directory):
                 #print(str(c))
                 #if EVI is valid, fill value of blank array
                 if(EVIFilearray[r][c] > 0):
-                    value = int(((EVIFilearray[r][c]+2000)/12000)*255)
+                    value = int((( (EVIFilearray[r][c])/1000+2000)/12000)*255)
                     pixels[r,c] = (value,value,value)
                 #if invalid, set to white
                 else:

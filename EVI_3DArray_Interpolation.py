@@ -9,9 +9,10 @@ from multiprocessing import Pool
 from PIL import Image 
 from tifffile import imsave, imread
 
-ROWS = 2277
-COLS = 2614
-TotalFilesTemp = 320
+ROWS = 2272
+COLS = 2485
+
+
 
 directory = 'Datasets/EVI' #source directory
 itteration = 1
@@ -19,7 +20,7 @@ currFile = 1
 dirFile = len(os.listdir(directory))
 totalFile = len(os.listdir(directory))*16
 depth = 0   #Starting depth
-day = 2     #The starting day used for naming the files
+day = 1     #The starting day used for naming the files
 FileArray = np.zeros((dirFile, ROWS, COLS), int) #Array that stores all of the exsisting EVI Files
 
 
@@ -47,9 +48,10 @@ InterpelatedArray = np.empty((15, ROWS, COLS))
 #Looping though each of the EVI 
 for EVI_File in range (len(FileArray)):
 
+    print("Working on file: " + str(EVI_File))
     #Marking down the 1st and 2nd EVI Immage that I am interpelating in between
     #Making sure that I don't go outside the bounds of the index
-    if EVI_File+1 < len(FileArray)-1:
+    if EVI_File+1 < len(FileArray):
         EVI1 = FileArray[EVI_File]
         EVI2 = FileArray[EVI_File+1]
     else:
@@ -68,24 +70,32 @@ for EVI_File in range (len(FileArray)):
             for x in range(15): 
                 #I am multipling the data by 1000 to scale it and not loose the data
                 InterpelatedArray[x][row][cols]= int((y1+((x+2)-1)*((y2-y1)/(16-1))) *1000)  
-            
-                print("Pixel Row: " + str(row) + " Pixel Column: " + str(cols) + " Pixel #: " + str(x) + " / 16")   
+                
+                #print(str(InterpelatedArray[x][row][cols]))
+                #print("Pixel Row: " + str(row) + " Pixel Column: " + str(cols) + " Pixel #: " + str(x) + " / 16")   
 
-    print("Image Interpelation Compleate: " + str(itteration) + " / " + str(dirFile) + " ...Generating Imiges... ")
+    #print(InterpelatedArray[EVI_File])
+
+    print("Image Interpelation Compleate: " + str(itteration) + " / " + str(dirFile-1) + " ...Generating Imiges... ")
     itteration += 1
 
     #Generating Tiff Files Using NpArray 
-    for y in range(15):
+    for y in range(14):
         #InterpelatedArray = InterpelatedArray.astype(np.uint16)
-        Data = Image.fromarray(InterpelatedArray)
+        day +=1
+        Data = Image.fromarray(InterpelatedArray[y])
         saveName = "EVI_Interpelated" + str(day)
         saveLocation = "C:/Users/denys/Documents/GitHub/Project_2/Datasets/EVI_Interpelated/" + str(saveName) + ".tif"
         Data.save(str(saveLocation), 'TIFF')
-        day +=1
-    day +=1
+        
+    day += 1
 
             
 
+
+
+
 #Meathod for interpelating 15 imiges between the two file arrays
 
-#def interpalateImiges()
+def interpalateImiges():
+        print("Method buildign in progress...")
