@@ -88,5 +88,4 @@ for EVI_File in range (len(FileArray)):
 
 #Meathod for interpelating 15 imiges between the two file arrays
 
-
-def interpalateImiges()
+#def interpalateImiges()

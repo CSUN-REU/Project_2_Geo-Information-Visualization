@@ -62,7 +62,11 @@ for EVI_File in range (len(FileArray)):
     PandasInterpelatedArray = pd.DataFrame(InterpelatedArray)
 
     #testing the data in the PandasInterpelatedArray
-    
+    count = 0
+    for i in PandasInterpelatedArray:
+        if PandasInterpelatedArray[i] > 0:
+            count += 1
+    print(str(count))
     
 
     PandasInterpelatedArray.interpolate(method ='linear', limit_direction ='both')
