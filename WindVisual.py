@@ -32,10 +32,10 @@ def process_image(f):
                 else:
                     pixels[c,r] = (value,value,value)
             else:
-                pixels[c,r] = (255,0,0)
+                pixels[c,r] = (255,255,255)
 
     #Write to destination
-    imageio.imwrite("Datasets/EVI_Visulized/" + str(random.random()) + ".png", im) 
+    imageio.imwrite("Datasets/EVI_Visulized/" + str(currFile) + ".png", im) 
     print("Done!")
     
 
