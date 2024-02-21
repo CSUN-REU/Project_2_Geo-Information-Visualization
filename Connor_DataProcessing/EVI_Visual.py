@@ -1,3 +1,5 @@
+#Python script to convert the geospatial data into greyscale PNG images as an input to the Blender software
+
 from multiprocessing import Pool
 import random
 import sys
